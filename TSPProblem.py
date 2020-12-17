@@ -272,7 +272,7 @@ class TSPProblem:
         self.elitism = 0.2 # Self-setting elitism para
 
     # Determine the fitness function
-    def all_fits(self) -> list:
+    def all_fits(self, dist=None, fits=None) -> list:
         for i in range(len(self.population.individual_list)):
             for individual in self.population.individual_list:
                 for k in individual.city_route:
@@ -283,7 +283,7 @@ class TSPProblem:
     # Calculate fitness sum
     def sum(self):
         total = 0
-        for i in range(len(all_fits)):
+        for i in range(len(self.fitness)):
             total += self.fitness[i]
         return total
 
@@ -300,38 +300,40 @@ class TSPProblem:
         """
         # fitness proportionate selection (roulette wheel selection)
         if selection_method == 1:
+            possibility = None
             for i in range(len(self.population.individual_list)):
                 possibility[i] = self.fitness[i]/sum
             minp = min(possibility)
             for i in range(len(possibility)):
-                if (minp == possibility[i]):
+                if minp == possibility[i]:
                     best = self.population.individual_list[i]
 
         # tournament selection
         elif selection_method == 2:
-            if self.tournament_size >= len(population):
+            if self.tournament_size >= len(self.population):
                 raise ValueError("Tournament size is larger than population size")
-            competitors = sample(population.individual_list, self.tournament_size)
-            dist = all_fits(competitors)
+            competitors = random.sample(self.population.individual_list, self.tournament_size)
+            dist = self.all_fits(competitors)
             mindist = min(dist)
             for i in range(len(competitors)):
-                if (mindist ==dist[i]):
+                if mindist ==dist[i]:
                     best = competitors[i]
 
         # elitism
         elif selection_method == 3:
             num = self.elitism * len(self.population)
             k = 0
+            elitis = None
             fits3 = self.fitness
             fits3.sort()
             for i in len(self.fitness):
-                if (i < num):
+                if i < num:
                     elitis[k] = self.population.individual_list[i]
                     k += 1
-            dist = all_fits(elitis)
+            dist = self.all_fits(elitis)
             mindist = min(dist)
             for i in range(len(elitis)):
-                if (mindist ==dist[i]):
+                if mindist ==dist[i]:
                     best = elitis[i]
         else:
             raise ValueError("Value is not permitted")
