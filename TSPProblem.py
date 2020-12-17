@@ -1,5 +1,6 @@
-import numpy as np
 import random
+
+import numpy as np
 
 
 class City:
@@ -28,8 +29,11 @@ class City:
 
 
 class Individual:
-    def __init__(self, city_list):
-        self.city_route = random.sample(city_list, len(city_list))
+    def __init__(self, city_list, randomly=True):
+        if randomly:
+            self.city_route = random.sample(city_list, len(city_list))
+        else:
+            self.city_route = city_list
 
     def exchange(self, first_index: int, second_index: int) -> None:
         """
@@ -171,7 +175,7 @@ class Population:
                 p2 = (end + 1 + i) % size
                 offspring2[p2] = sort1[i]
 
-            return Individual(offspring1), Individual(offspring2)
+            return Individual(offspring1, False), Individual(offspring2, False)
 
         # PMXCrossover
         elif crossover_method == 2:
@@ -189,7 +193,6 @@ class Population:
             for y in parent2.city_route:
                 offspring2.append(y)
             size = len(parent1.city_route)
-            # 将cross2中尚未被复制的元素放入offspring1正确的位置,对于cross1相似操作
             # put elements in cross2 which haven't be copied into the right position in offspring1
             for i in range(end + 1 - start):
                 # operate for cross2
@@ -229,7 +232,7 @@ class Population:
                 else:
                     offspring2[j] = parent1.city_route[j]
 
-            return Individual(offspring1), Individual(offspring2)
+            return Individual(offspring1, False), Individual(offspring2, False)
 
         # CycleCrossover
         elif crossover_method == 3:
@@ -254,29 +257,142 @@ class Population:
                     offspring2.append(parent2.city_route[i])
                     offspring1.append(parent1.city_route[i])
 
-            return Individual(offspring1), Individual(offspring2)
+            return Individual(offspring1, False), Individual(offspring2, False)
 
-        # # EdgeRecombination
-        # elif crossover_method == 4:
+        # EdgeRecombination
+        elif crossover_method == 4:
+            # construct the Table of Edges
+            table = []
+            size = len(parent1.city_route)
+            for i in range(size):
+                element = parent1.city_route[i]
+                edges = [parent1.city_route[(i + 1) % size], parent1.city_route[(i - 1) % size]]
+                index = parent2.city_route.index(element)
+                edges.append(parent2.city_route[(index + 1) % size])
+                edges.append(parent2.city_route[(index - 1) % size])
+                table.append(edges)
+            # choose the start city randomly
+            offspring1 = []
+            offspring2 = []
+            start1, start2 = random.sample(range(size), 2)
+            startElement1 = parent1.city_route[start1]
+            startElement2 = parent1.city_route[start2]
+            offspring1.append(startElement1)
+            offspring2.append(startElement2)
+
+            nextElement = None
+            shortest = 5
+            # generate 2 offspring based on the Table of Edges
+            while len(offspring1) != size:
+                if len(offspring1) == 1:
+                    choices = list(filter(lambda k: k not in offspring1, table[start1]))
+                else:
+                    choices = list(filter(lambda k: k not in offspring1, table[parent1.city_route.index(nextElement)]))
+                haveCommonEdge = False
+                shortest = 5
+                if len(choices) == 1:
+                    nextElement = choices[0]
+                    offspring1.append(nextElement)
+                    continue
+
+                for i in range(len(choices)):
+                    choice = choices[i]
+                    for j in range(i + 1, len(choices)):
+                        otherChoice = choices[j]
+                        if choice == otherChoice and i != j:
+                            haveCommonEdge = True
+                            break
+                    if haveCommonEdge:
+                        nextElement = choice
+                        break
+                    else:
+                        entityChoices = list(
+                            filter(lambda k: k not in offspring1, table[parent1.city_route.index(choice)]))
+                        entityChoices = list(set(entityChoices))
+                        length = len(entityChoices)
+                        if length < shortest:
+                            shortest = length
+                            nextElement = choice
+
+                offspring1.append(nextElement)
+
+            while len(offspring2) != size:
+                if len(offspring2) == 0:
+                    choices = list(filter(lambda k: k not in offspring2, table[start2]))
+                else:
+                    choices = list(filter(lambda k: k not in offspring2, table[parent1.city_route.index(nextElement)]))
+                haveCommonEdge = False
+                shortest = 5
+                if len(choices) == 1:
+                    nextElement = choices[0]
+                    offspring2.append(nextElement)
+                    continue
+
+                for choice in choices:
+                    for otherChoice in choices:
+                        if choice == otherChoice and choices.index(choice) != choices.index(otherChoice):
+                            haveCommonEdge = True
+                            break
+                    if haveCommonEdge:
+                        nextElement = choice
+                        break
+                    else:
+                        entityChoices = list(
+                            filter(lambda k: k not in offspring2, table[parent1.city_route.index(choice)]))
+                        entityChoices = list(set(entityChoices))
+                        length = len(entityChoices)
+                        if length < shortest:
+                            shortest = length
+                            nextElement = choice
+
+                offspring2.append(nextElement)
+            return Individual(offspring1, False), Individual(offspring2, False)
+
         # Other methods are forbidden
         else:
             raise ValueError("Value is not permitted")
 
+# TEST for crossover
+# if __name__ == "__main__":
+#     c1 = City(1, 1, 1)
+#     c2 = City(0, 2, 2)
+#     c3 = City(0, 3, 3)
+#     c4 = City(0, 4, 4)
+#     c5 = City(0, 5, 5)
+#     c6 = City(0, 6, 6)
+#     c7 = City(0, 7, 7)
+#     c8 = City(0, 8, 8)
+#     c9 = City(0, 9, 9)
+#     city_list1 = [c1, c2, c3, c4, c5, c6, c7, c8, c9]
+#     city_list2 = [c9, c3, c7, c8, c2, c6, c5, c1, c4]
+#     parent1 = Individual(city_list1, False)
+#     parent2 = Individual(city_list2, False)
+#     population = Population(10, city_list1)
+#     offspring1, offspring2 = population.crossover(4, parent1, parent2)
+#     list1 = []
+#     for i in range(len(parent1.city_route)):
+#         list1.append(offspring1.city_route[i].seq)
+#     list2 = []
+#     for i in range(len(parent1.city_route)):
+#         list2.append(offspring2.city_route[i].seq)
+#
+#     print(list1)
+#     print(list2)
 
 
 class TSPProblem:
     def __init__(self, population_number: int, city_list: list):
         self.population = Population(population_number, city_list)
         self.fitness = self.all_fits()
-        self.tournament_size = 2 # Self-setting tournament_size
-        self.elitism = 0.2 # Self-setting elitism para
+        self.tournament_size = 2  # Self-setting tournament_size
+        self.elitism = 0.2  # Self-setting elitism para
 
     # Determine the fitness function
     def all_fits(self) -> list:
         for i in range(len(self.population.individual_list)):
             for individual in self.population.individual_list:
                 for k in individual.city_route:
-                    dist += k.city_distance(k,k+1)
+                    dist += k.city_distance(k, k + 1)
             fits[i] = dist
         return fits
 
@@ -301,7 +417,7 @@ class TSPProblem:
         # fitness proportionate selection (roulette wheel selection)
         if selection_method == 1:
             for i in range(len(self.population.individual_list)):
-                possibility[i] = self.fitness[i]/sum
+                possibility[i] = self.fitness[i] / sum
             minp = min(possibility)
             for i in range(len(possibility)):
                 if (minp == possibility[i]):
@@ -315,7 +431,7 @@ class TSPProblem:
             dist = all_fits(competitors)
             mindist = min(dist)
             for i in range(len(competitors)):
-                if (mindist ==dist[i]):
+                if (mindist == dist[i]):
                     best = competitors[i]
 
         # elitism
@@ -331,12 +447,11 @@ class TSPProblem:
             dist = all_fits(elitis)
             mindist = min(dist)
             for i in range(len(elitis)):
-                if (mindist ==dist[i]):
+                if (mindist == dist[i]):
                     best = elitis[i]
         else:
             raise ValueError("Value is not permitted")
         return best
-
 
     # TODO
     def begin(self):
