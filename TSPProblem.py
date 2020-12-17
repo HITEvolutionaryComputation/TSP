@@ -116,13 +116,14 @@ class Population:
         for i in range(population_number):
             self.individual_list.append(Individual(city_list))
 
-    # TODO
-    def crossover(self, selection_method: int) -> None:
+    def crossover(self, crossover_method: int, parent1: Individual, parent2: Individual) -> (Individual, Individual):
         """
         Do the crossover operation.
 
         Crossover operation occurs within the population.
-        :param selection_method: this parameter represents a crossover method.
+        :param crossover_method: this parameter represents a crossover method.
+        :param parent1: The first parent
+        :param parent2: The second parent
         This is the mapping chart:
 
         crossover_method | real_method
@@ -131,9 +132,136 @@ class Population:
         3 -> Cycle Crossover
         4 -> Edge Recombination
 
-        :return:
+        :return: a tuple which represents (offspring1, offspring2)
         """
-        pass
+
+        # OrderCrossover
+        if crossover_method == 1:
+            # select the start and end point for the crossFragment randomly
+            m, n = random.sample(range(len(parent1.city_route)), 2)
+            start, end = min(m, n), max(m, n)
+            cross1 = parent1.city_route[start: end + 1]
+            cross2 = parent2.city_route[start: end + 1]
+
+            # shallow-copy
+            offspring1 = []
+            for x in parent1.city_route:
+                offspring1.append(x)
+            offspring2 = []
+            for y in parent2.city_route:
+                offspring2.append(y)
+            size = len(parent1.city_route)
+
+            # sort the elements in parent2 which doesn't in cross1, do the same thing for parent1
+            sort2 = []
+            sort1 = []
+            for i in range(size):
+                index2 = (end + 1 + i) % size
+                if not (parent2.city_route[index2] in cross1):
+                    sort2.append(parent2.city_route[index2])
+
+                index1 = (end + 1 + i) % size
+                if not (parent1.city_route[index1] in cross2):
+                    sort1.append(parent1.city_route[index1])
+
+            for i in range(len(sort2)):
+                p1 = (end + 1 + i) % size
+                offspring1[p1] = sort2[i]
+
+                p2 = (end + 1 + i) % size
+                offspring2[p2] = sort1[i]
+
+            return Individual(offspring1), Individual(offspring2)
+
+        # PMXCrossover
+        elif crossover_method == 2:
+            # select the start and end point for the crossFragment randomly
+            m, n = random.sample(range(len(parent1.city_route)), 2)
+            start, end = min(m, n), max(m, n)
+            cross1 = parent1.city_route[start: end + 1]
+            cross2 = parent2.city_route[start: end + 1]
+
+            # shallow-copy
+            offspring1 = []
+            for x in parent1.city_route:
+                offspring1.append(x)
+            offspring2 = []
+            for y in parent2.city_route:
+                offspring2.append(y)
+            size = len(parent1.city_route)
+            # 将cross2中尚未被复制的元素放入offspring1正确的位置,对于cross1相似操作
+            # put elements in cross2 which haven't be copied into the right position in offspring1
+            for i in range(end + 1 - start):
+                # operate for cross2
+                if cross2[i] in cross1:
+                    continue
+                else:
+                    tmp = cross1[i]
+                    index2 = parent2.city_route.index(tmp)
+                    # when the position is taken
+                    while start <= index2 <= end:
+                        tmp = parent1.city_route[index2]
+                        index2 = parent2.city_route.index(tmp)
+                    offspring1[index2] = cross2[i]
+
+            # copy the rest elements from parent2 to offspring1
+            for i in range(size):
+                if (parent2.city_route[i] in cross1) or (parent2.city_route[i] in cross2):
+                    continue
+                else:
+                    offspring1[i] = parent2.city_route[i]
+
+            # do the same thing for cross2
+            for j in range(end + 1 - start):
+                if cross1[j] in cross2:
+                    continue
+                else:
+                    tmp = cross2[j]
+                    index1 = parent1.city_route.index(tmp)
+                    while start <= index1 <= end:
+                        tmp = parent2.city_route[index1]
+                        index1 = parent1.city_route.index(tmp)
+                    offspring2[index1] = cross1[j]
+
+            for j in range(size):
+                if (parent1.city_route[j] in cross1) or (parent1.city_route[j] in cross2):
+                    continue
+                else:
+                    offspring2[j] = parent1.city_route[j]
+
+            return Individual(offspring1), Individual(offspring2)
+
+        # CycleCrossover
+        elif crossover_method == 3:
+            x = random.randint(0, len(parent1.city_route) - 1)
+
+            flag = [False] * len(parent1.city_route)
+            flag[x] = True
+
+            tmp = parent2.city_route[x]
+            while tmp != parent1.city_route[x]:
+                p = parent1.city_route.index(tmp)
+                flag[p] = True
+                tmp = parent2.city_route[p]
+
+            offspring1 = []
+            offspring2 = []
+            for i in range(len(parent1.city_route)):
+                if flag[i]:
+                    offspring2.append(parent1.city_route[i])
+                    offspring1.append(parent2.city_route[i])
+                else:
+                    offspring2.append(parent2.city_route[i])
+                    offspring1.append(parent1.city_route[i])
+
+            return Individual(offspring1), Individual(offspring2)
+
+        # # EdgeRecombination
+        # elif crossover_method == 4:
+        # Other methods are forbidden
+        else:
+            raise ValueError("Value is not permitted")
+
 
 
 class TSPProblem:
