@@ -67,8 +67,8 @@ class Individual:
 
         # The insert method
         if mutation_method == 1:
-            first_index = random.randint(0, len(self.city_route))
-            second_index = random.randint(0, len(self.city_route))
+            first_index = random.randint(0, len(self.city_route) - 1)
+            second_index = random.randint(0, len(self.city_route) - 1)
             if first_index == second_index:
                 return
             first_index, second_index = min(first_index, second_index), \
@@ -79,8 +79,8 @@ class Individual:
 
         # The swap method
         elif mutation_method == 2:
-            first_index = random.randint(0, len(self.city_route))
-            second_index = random.randint(0, len(self.city_route))
+            first_index = random.randint(0, len(self.city_route) - 1)
+            second_index = random.randint(0, len(self.city_route) - 1)
             if first_index == second_index:
                 return
             first_index, second_index = min(first_index, second_index), \
@@ -89,8 +89,8 @@ class Individual:
 
         # The Inversion method
         elif mutation_method == 3:
-            first_index = random.randint(0, len(self.city_route))
-            second_index = random.randint(0, len(self.city_route))
+            first_index = random.randint(0, len(self.city_route) - 1)
+            second_index = random.randint(0, len(self.city_route) - 1)
             if first_index == second_index:
                 return
             first_index, second_index = min(first_index, second_index), \
