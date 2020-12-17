@@ -433,9 +433,6 @@ class TSPProblem:
             mindist = min(dist)
             for i in range(len(competitors)):
                 if mindist ==dist[i]:
-=======
-                if (mindist == dist[i]):
->>>>>>> 7c5c9f4d4155a4c424ac70dcd4106c81cb4beffb
                     best = competitors[i]
 
         # elitism
@@ -452,11 +449,7 @@ class TSPProblem:
             dist = self.all_fits(elitis)
             mindist = min(dist)
             for i in range(len(elitis)):
-<<<<<<< HEAD
                 if mindist ==dist[i]:
-=======
-                if (mindist == dist[i]):
->>>>>>> 7c5c9f4d4155a4c424ac70dcd4106c81cb4beffb
                     best = elitis[i]
         else:
             raise ValueError("Value is not permitted")
