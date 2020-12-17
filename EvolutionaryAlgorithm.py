@@ -1,11 +1,11 @@
 from TSPProblem import *
 class EvolutionaryAlgorithm:
-    def __init__(self,Problem:TSPProblem,Algorithm,):
+    def __init__(self,Problem:TSPProblem,Algorithm):
         self.Problem=Problem
         self.Algorithm=Algorithm
         self.mutationRate=0.4
     def run(self):
-        temp=self.Problem.selection(3)#selection(int(self.Algorithm[0]))
+        temp=self.Problem.selection(int(self.Algorithm[0]))
         offsprings = []
         while len(offsprings) < self.Problem.size:
             x, y = random.sample(range(len(temp)), 2)

@@ -16,7 +16,7 @@ for filename in filenames:
             test1.write(filename+' algorithm:'+"".join('%s' %id for id in algorithm)+' size:'+str(size))#向“test1” 输入 问题：算法：size：
             test1.write('\n')
             Problem=TSPProblem(file__name, size)
-            temp=EvolutionaryAlgorithm(algorithm, Problem)
+            temp=EvolutionaryAlgorithm(Problem,algorithm)
             for gen in range(20000):
                 temp.run()
                 if gen%100==0:#每100次gen，向“log”写入一个route

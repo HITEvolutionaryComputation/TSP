@@ -16,7 +16,7 @@ for filename in filenames:
     cost_list=[]
     for r in range(repeat):
         for gen in range(10000):
-            EvolutionaryAlgorithm(algorithm,Problem)
+            EvolutionaryAlgorithm(Problem,algorithm)
             if gen % 100 == 0:  # 每100次gen，向“log”写入一个route
                 solution, cost = Problem.population.best_individual()
                 log.write(solution)
