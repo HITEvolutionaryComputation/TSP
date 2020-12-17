@@ -1,6 +1,6 @@
 import random
-
 import numpy as np
+import linecache
 
 
 class City:
@@ -38,7 +38,7 @@ class Individual:
     def route_distance(self) -> int:
         dist = 0
         for i in range(len(self.city_route)-1):
-            dist += self.city_route[i].city_distance(self.city_route[i],self.city_route[i+1])
+            dist += self.city_route[i].city_distance(self.city_route[i+1])
         return dist
 
     def exchange(self, first_index: int, second_index: int) -> None:
@@ -385,14 +385,37 @@ class Population:
 #     print(list1)
 #     print(list2)
 
+    def change(self,list):
+        self.individual_list=list
+    def getindi(self,index):
+        return self.individual_list[index]
+    def best_individual(self):
+        dist=self.individual_list[0].route_distance()
+        for temp in self.individual_list:
+            if temp.route_distance()<dist:
+                dist=temp.route_distance()
+                solution=temp
+        return solution,dist
+
 
 class TSPProblem:
-    def __init__(self, population_number: int, city_list: list):
+    def __init__(self,file_name,size):
+        self.size=size
+        population_number=size
+
+        city_list=[]
+        problem = open(file_name, 'r')
+        self.n = int(linecache.getline(file_name, 4).split()[2])  # 城市数量
+        for i in range(self.n):
+            i, x, y = linecache.getline(file_name, i + 7).split()#变量？元组
+            city_list.append(City(int(i),int(x),int(y)))
+
         self.population = Population(population_number, city_list)
         self.fitness = self.all_fits()
         self.rate = 0.5 # Self-setting select rate
         self.tournament_size = 2  # Self-setting tournament_size
         self.elitism = 0.2  # Self-setting elitism para
+        problem.close()
 
     # Determine the fitness function
     def all_fits(self) -> list:
@@ -459,10 +482,10 @@ class TSPProblem:
             raise ValueError("Value is not permitted")
         return sorted(best)
 
-    # TODO
-    def begin(self):
-        """
-        To be continued
-        :return:
-        """
-        pass
+    # # TODO
+    # def begin(self):
+    #     """
+    #     To be continued
+    #     :return:
+    #     """
+    #     pass
