@@ -35,6 +35,12 @@ class Individual:
         else:
             self.city_route = city_list
 
+    def route_distance(self) -> int:
+        dist = 0
+        for i in range(len(self.city_route)-1):
+            dist += self.city_route[i].city_distance(self.city_route[i],self.city_route[i+1])
+        return dist
+
     def exchange(self, first_index: int, second_index: int) -> None:
         """
         Exchange the city_route value which is correspond to the indices
@@ -384,26 +390,25 @@ class TSPProblem:
     def __init__(self, population_number: int, city_list: list):
         self.population = Population(population_number, city_list)
         self.fitness = self.all_fits()
+        self.rate = 0.5 # Self-setting select rate
         self.tournament_size = 2  # Self-setting tournament_size
         self.elitism = 0.2  # Self-setting elitism para
 
     # Determine the fitness function
-    def all_fits(self, dist=None, fits=None) -> list:
-        for i in range(len(self.population.individual_list)):
-            for individual in self.population.individual_list:
-                for k in individual.city_route:
-                    dist += k.city_distance(k, k + 1)
-            fits[i] = dist
+    def all_fits(self) -> list:
+        fits = []
+        for i in self.population.individual_list:
+            fits.append(1./i.route_distance())
         return fits
 
     # Calculate fitness sum
-    def sum(self):
+    def sum(self) -> int:
         total = 0
         for i in range(len(self.fitness)):
             total += self.fitness[i]
         return total
 
-    def selection(self, selection_method: int) -> Individual:
+    def selection(self, selection_method: int):
         """
         Select individual from the population
         :param selection_method: this parameter represents a selection method.
@@ -416,44 +421,43 @@ class TSPProblem:
         """
         # fitness proportionate selection (roulette wheel selection)
         if selection_method == 1:
-            possibility = None
-            for i in range(len(self.population.individual_list)):
-                possibility[i] = self.fitness[i] / sum
-            minp = min(possibility)
-            for i in range(len(possibility)):
-                if minp == possibility[i]:
-                    best = self.population.individual_list[i]
+            fitness = np.array(self.fitness)
+            possibility = fitness / sum(fitness)
+            size = int(len(fitness) * self.rate)
+            best = np.random.choice([i for i in self.population.individual_list], size=size, p=possibility)
 
         # tournament selection
         elif selection_method == 2:
             if self.tournament_size >= len(self.population):
                 raise ValueError("Tournament size is larger than population size")
-            competitors = random.sample(self.population.individual_list, self.tournament_size)
-            dist = self.all_fits(competitors)
-            mindist = min(dist)
-            for i in range(len(competitors)):
-                if mindist ==dist[i]:
-                    best = competitors[i]
+            # competitors = random.sample(self.population.individual_list, self.tournament_size)
+            # dist = self.all_fits(competitors)
+            # mindist = min(dist)
+            # for i in range(len(competitors)):
+            #     if mindist == dist[i]:
+            #         best = competitors[i]
+            best = []
+            while len(best) < len(self.fitness) * self.rate:
+                x, y = random.sample(range(len(self.fitness)), self.tournament_size)
+                if self.fitness[x] >= self.fitness[y]:
+                    best.append(self.population.individual_list[x])
+                else:
+                    best.append(self.population.individual_list[y])
 
         # elitism
         elif selection_method == 3:
-            num = self.elitism * len(self.population)
-            k = 0
-            elitis = None
-            fits3 = self.fitness
-            fits3.sort()
-            for i in len(self.fitness):
-                if i < num:
-                    elitis[k] = self.population.individual_list[i]
-                    k += 1
-            dist = self.all_fits(elitis)
-            mindist = min(dist)
-            for i in range(len(elitis)):
-                if mindist ==dist[i]:
-                    best = elitis[i]
+            best = []
+            # Serial numbers correspond to fitness
+            it = {i: self.fitness[i] for i in range(len(self.fitness))}
+            # sorted by fitness
+            sorted_fitness = sorted(it.items(), key=lambda x: (x[1], x[0]), reverse=True)
+            size = int(len(self.fitness) * self.rate)
+            ilist = [sorted_fitness[: size][i][0] for i in range(size)]
+            for i in range(size):
+                best.append(self.population.individual_list[ilist[i]])
         else:
             raise ValueError("Value is not permitted")
-        return best
+        return sorted(best)
 
     # TODO
     def begin(self):
