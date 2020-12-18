@@ -9,17 +9,16 @@ class EvolutionaryAlgorithm:
         offsprings = []
         while len(offsprings) < self.Problem.size:
             x, y = random.sample(range(len(temp)), 2)
-            indi1=self.Problem.population.getindi(x)
-            indi2=self.Problem.population.getindi(y)
+            indi1=temp[x]
+            indi2=temp[y]
             cross1, cross2=self.Problem.population.crossover(self.Algorithm[1],indi1,indi2)
+            rand = random.random()
+            if rand <= self.mutationRate:
+                cross1.mutation(self.Algorithm[2])
 
             rand = random.random()
             if rand <= self.mutationRate:
-                cross1 = cross1.mutation(self.Algorithm[2])
-
-            rand = random.random()
-            if rand <= self.mutationRate:
-                cross1 = cross1.mutation(self.Algorithm[2])
+                cross2.mutation(self.Algorithm[2])
 
             offsprings.append(cross1)
             offsprings.append(cross2)

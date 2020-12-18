@@ -35,10 +35,17 @@ class Individual:
         else:
             self.city_route = city_list
 
-    def route_distance(self) -> int:
+    # def route_distance(self) -> int:
+    #     dist = 0
+    #     for i in range(len(self.city_route)-1):
+    #         dist += self.city_route[i].city_distance(self.city_route[i+1])
+    #     return dist
+    def route_distance(self) -> float:
         dist = 0
-        for i in range(len(self.city_route)-1):
-            dist += self.city_route[i].city_distance(self.city_route[i+1])
+        size = len(self.city_route)
+        for i in range(size - 1):
+            dist += self.city_route[i].city_distance(self.city_route[i + 1])
+        dist += self.city_route[size-1].city_distance(self.city_route[0])
         return dist
 
     def exchange(self, first_index: int, second_index: int) -> None:
@@ -389,13 +396,25 @@ class Population:
         self.individual_list=list
     def getindi(self,index):
         return self.individual_list[index]
-    def best_individual(self):
-        dist=self.individual_list[0].route_distance()
-        for temp in self.individual_list:
-            if temp.route_distance()<dist:
-                dist=temp.route_distance()
-                solution=temp
-        return solution,dist
+    # def best_individual(self):
+    #     dist=self.individual_list[0].route_distance()
+    #     print()
+    #     for temp in self.individual_list:
+    #         if temp.route_distance()<dist:
+    #             dist=temp.route_distance()
+    #             solution=temp
+    #     return solution.city_route,dist
+    def findLeastCost(self):
+        leastCost = float("inf")
+        tarIndividual = None
+        for x in self.individual_list:
+            if x.route_distance()<leastCost:
+                leastCost = x.route_distance()
+                tarIndividual = x
+        seqList = []
+        for city in tarIndividual.city_route:
+            seqList.append(str(city.seq))
+        return ' '.join(seqList),leastCost
 
 
 class TSPProblem:
@@ -408,7 +427,8 @@ class TSPProblem:
         self.n = int(linecache.getline(file_name, 4).split()[2])  # 城市数量
         for i in range(self.n):
             i, x, y = linecache.getline(file_name, i + 7).split()#变量？元组
-            city_list.append(City(int(i),int(x),int(y)))
+            #print('%d,%d,%d',i,x,y) 读文件正常
+            city_list.append(City(int(x),int(y),int(i)))
 
         self.population = Population(population_number, city_list)
         self.fitness = self.all_fits()
@@ -480,7 +500,7 @@ class TSPProblem:
                 best.append(self.population.individual_list[ilist[i]])
         else:
             raise ValueError("Value is not permitted")
-        return sorted(best)
+        return best #sorted(best)
 
     # # TODO
     # def begin(self):

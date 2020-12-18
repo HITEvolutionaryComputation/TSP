@@ -15,26 +15,34 @@ for filename in filenames:
         for algorithm in algorithms:
             test1.write(filename+' algorithm:'+"".join('%s' %id for id in algorithm)+' size:'+str(size))#向“test1” 输入 问题：算法：size：
             test1.write('\n')
+            log.write(filename+' algorithm:'+"".join('%s' %id for id in algorithm)+' size:'+str(size))
+            log.write('\n')
+
             Problem=TSPProblem(file__name, size)
             temp=EvolutionaryAlgorithm(Problem,algorithm)
             for gen in range(20000):
                 temp.run()
                 if gen%100==0:#每100次gen，向“log”写入一个route
-                    solution,cost=Problem.population.best_individual()
+                    solution,cost=Problem.population.findLeastCost()#findLeastCost的返回是list还是str？
                     log.write(solution)
                     log.write('\n')
                 if gen==5000:#5k、10k、20k处报告cost
-                    solution, cost = Problem.population.best_individual()
-                    test1.write(cost+' ')
+                    solution, cost = Problem.population.findLeastCost()
+                    test1.write(str(cost)+' ')
                 if gen==10000:
-                    solution, cost = Problem.population.best_individual()
-                    test1.write(cost+' ')
+                    solution, cost = Problem.population.findLeastCost()
+                    test1.write(str(cost)+' ')
                 if gen==20000:#20k cost处提行
-                    solution, cost = Problem.population.best_individual()
-                    test1.write(cost+' ')
+                    solution, cost = Problem.population.findLeastCost()
+                    test1.write(str(cost)+' ')
                     log.write('\r\n')
-            test1.write('\r\n')
-    log.close()
+
+            test1.write('\r\n') #10*4*3 一种结束就空行
+            log.write('\r\n') #10*4*3 一种结束就空行
+            log.flush()
+            test1.flush()
+
+    log.close()#已经对这个问题试过所有的size和algorithm，可以结束了
 test1.close()
 
 
