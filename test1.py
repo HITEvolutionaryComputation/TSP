@@ -6,11 +6,11 @@ generations = [5000, 10000, 20000]
 algorithms=[[3, 1, 1], [3, 1, 2], [3, 2, 1]]
 
 
-test1=open('test1/test1.txt','w')#open“test1”
+test1=open('test1/test1.txt','w')  # open“test1”
 for filename in filenames:
     file_name='test1/'+filename+'.txt'
     log=open(file_name,'w')
-    file__name=filename+'.tsp'#open".tsp"
+    file__name=filename+'.tsp'  # open".tsp"
     for size in sizes:
         for algorithm in algorithms:
             test1.write(filename+' algorithm:'+"".join('%s' %id for id in algorithm)+' size:'+str(size))#向“test1” 输入 问题：算法：size：
@@ -22,11 +22,11 @@ for filename in filenames:
             temp=EvolutionaryAlgorithm(Problem,algorithm)
             for gen in range(20000):
                 temp.run()
-                if gen%100==0:#output result per hundred iteration
+                if gen%100==0:  # output result per hundred iteration
                     solution,cost=Problem.population.findLeastCost()
                     log.write(solution)
                     log.write('\n')
-                if gen==4999:#report when 5k、10k、20k
+                if gen==4999:  # report when 5k、10k、20k
                     solution, cost = Problem.population.findLeastCost()
                     test1.write(str(cost)+' ')
                 if gen==9999:

@@ -45,7 +45,7 @@ class Individual:
         size = len(self.city_route)
         for i in range(size - 1):
             dist += self.city_route[i].city_distance(self.city_route[i + 1])
-        dist += self.city_route[size-1].city_distance(self.city_route[0])
+        dist += self.city_route[size - 1].city_distance(self.city_route[0])
         return dist
 
     def exchange(self, first_index: int, second_index: int) -> None:
@@ -365,73 +365,40 @@ class Population:
         else:
             raise ValueError("Value is not permitted")
 
-# TEST for crossover
-# if __name__ == "__main__":
-#     c1 = City(1, 1, 1)
-#     c2 = City(0, 2, 2)
-#     c3 = City(0, 3, 3)
-#     c4 = City(0, 4, 4)
-#     c5 = City(0, 5, 5)
-#     c6 = City(0, 6, 6)
-#     c7 = City(0, 7, 7)
-#     c8 = City(0, 8, 8)
-#     c9 = City(0, 9, 9)
-#     city_list1 = [c1, c2, c3, c4, c5, c6, c7, c8, c9]
-#     city_list2 = [c9, c3, c7, c8, c2, c6, c5, c1, c4]
-#     parent1 = Individual(city_list1, False)
-#     parent2 = Individual(city_list2, False)
-#     population = Population(10, city_list1)
-#     offspring1, offspring2 = population.crossover(4, parent1, parent2)
-#     list1 = []
-#     for i in range(len(parent1.city_route)):
-#         list1.append(offspring1.city_route[i].seq)
-#     list2 = []
-#     for i in range(len(parent1.city_route)):
-#         list2.append(offspring2.city_route[i].seq)
-#
-#     print(list1)
-#     print(list2)
+    def change(self, list):
+        self.individual_list = list
 
-    def change(self,list):
-        self.individual_list=list
-    def getindi(self,index):
+    def getindi(self, index):
         return self.individual_list[index]
-    # def best_individual(self):
-    #     dist=self.individual_list[0].route_distance()
-    #     print()
-    #     for temp in self.individual_list:
-    #         if temp.route_distance()<dist:
-    #             dist=temp.route_distance()
-    #             solution=temp
-    #     return solution.city_route,dist
+
     def findLeastCost(self):
         leastCost = float("inf")
         tarIndividual = None
         for x in self.individual_list:
-            if x.route_distance()<leastCost:
+            if x.route_distance() < leastCost:
                 leastCost = x.route_distance()
                 tarIndividual = x
         seqList = []
         for city in tarIndividual.city_route:
             seqList.append(str(city.seq))
-        return ' '.join(seqList),leastCost
+        return ' '.join(seqList), leastCost
 
 
 class TSPProblem:
-    def __init__(self,file_name,size):
-        self.size=size
-        population_number=size
+    def __init__(self, file_name, size):
+        self.size = size
+        population_number = size
 
-        city_list=[]
+        city_list = []
         problem = open(file_name, 'r')
         self.n = int(linecache.getline(file_name, 4).split()[2])  # number of city
         for i in range(self.n):
             i, x, y = linecache.getline(file_name, i + 7).split()
-            city_list.append(City(int(x),int(y),int(i)))
+            city_list.append(City(int(x), int(y), int(i)))
 
         self.population = Population(population_number, city_list)
         self.fitness = self.all_fits()
-        self.rate = 0.5 # Self-setting select rate
+        self.rate = 0.5  # Self-setting select rate
         self.tournament_size = 2  # Self-setting tournament_size
         self.elitism = 0.2  # Self-setting elitism para
         problem.close()
@@ -440,7 +407,7 @@ class TSPProblem:
     def all_fits(self) -> list:
         fits = []
         for i in self.population.individual_list:
-            fits.append(1./i.route_distance())
+            fits.append(1. / i.route_distance())
         return fits
 
     # Calculate fitness sum
@@ -499,12 +466,5 @@ class TSPProblem:
                 best.append(self.population.individual_list[ilist[i]])
         else:
             raise ValueError("Value is not permitted")
-        return best #sorted(best)
+        return best  # sorted(best)
 
-    # # TODO
-    # def begin(self):
-    #     """
-    #     To be continued
-    #     :return:
-    #     """
-    #     pass
