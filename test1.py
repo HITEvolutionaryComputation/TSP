@@ -26,13 +26,13 @@ for filename in filenames:
                     solution,cost=Problem.population.findLeastCost()#findLeastCost的返回是list还是str？
                     log.write(solution)
                     log.write('\n')
-                if gen==5000:#5k、10k、20k处报告cost
+                if gen==4999:#5k、10k、20k处报告cost
                     solution, cost = Problem.population.findLeastCost()
                     test1.write(str(cost)+' ')
-                if gen==10000:
+                if gen==9999:
                     solution, cost = Problem.population.findLeastCost()
                     test1.write(str(cost)+' ')
-                if gen==20000:#20k cost处提行
+                if gen==19999:#20k cost处提行
                     solution, cost = Problem.population.findLeastCost()
                     test1.write(str(cost)+' ')
                     log.write('\r\n')
