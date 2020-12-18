@@ -1,0 +1,9 @@
+eil51 algorithm:311 size:50eil51 average cost:1461.088871145162 standard deviation:50.76109540543522
+eil76 algorithm:311 size:50eil76 average cost:2275.3646157081594 standard deviation:71.417681351184
+eil101 algorithm:311 size:50eil101 average cost:3202.225500824776 standard deviation:79.70019538610765
+st70 algorithm:311 size:50st70 average cost:3265.8198320641573 standard deviation:89.16531448635867
+kroA100 algorithm:311 size:50kroA100 average cost:153292.0749325342 standard deviation:6865.102261986458
+kroC100 algorithm:311 size:50kroC100 average cost:152143.64065266718 standard deviation:6403.481536344247
+kroD100 algorithm:311 size:50kroD100 average cost:147516.30389056556 standard deviation:4689.677403508056
+lin105 algorithm:311 size:50lin105 average cost:109955.60606163865 standard deviation:3681.303725712803
+pcb442 algorithm:311 size:50
