@@ -6,11 +6,11 @@ generations = [5000, 10000, 20000]
 algorithms=[[3, 1, 1], [3, 1, 2], [3, 2, 1]]
 
 
-test1=open('test1/test1.txt','w')#打开“test1”
+test1=open('test1/test1.txt','w')#open“test1”
 for filename in filenames:
-    file_name='test1/'+filename+'.txt'# 打开一个新的“log（问题名）”文件
+    file_name='test1/'+filename+'.txt'
     log=open(file_name,'w')
-    file__name=filename+'.tsp'#tsp文件
+    file__name=filename+'.tsp'#open".tsp"
     for size in sizes:
         for algorithm in algorithms:
             test1.write(filename+' algorithm:'+"".join('%s' %id for id in algorithm)+' size:'+str(size))#向“test1” 输入 问题：算法：size：
@@ -22,27 +22,27 @@ for filename in filenames:
             temp=EvolutionaryAlgorithm(Problem,algorithm)
             for gen in range(20000):
                 temp.run()
-                if gen%100==0:#每100次gen，向“log”写入一个route
-                    solution,cost=Problem.population.findLeastCost()#findLeastCost的返回是list还是str？
+                if gen%100==0:#output result per hundred iteration
+                    solution,cost=Problem.population.findLeastCost()
                     log.write(solution)
                     log.write('\n')
-                if gen==4999:#5k、10k、20k处报告cost
+                if gen==4999:#report when 5k、10k、20k
                     solution, cost = Problem.population.findLeastCost()
                     test1.write(str(cost)+' ')
                 if gen==9999:
                     solution, cost = Problem.population.findLeastCost()
                     test1.write(str(cost)+' ')
-                if gen==19999:#20k cost处提行
+                if gen==19999:
                     solution, cost = Problem.population.findLeastCost()
                     test1.write(str(cost)+' ')
                     log.write('\r\n')
 
-            test1.write('\r\n') #10*4*3 一种结束就空行
-            log.write('\r\n') #10*4*3 一种结束就空行
+            test1.write('\r\n')
+            log.write('\r\n')
             log.flush()
             test1.flush()
 
-    log.close()#已经对这个问题试过所有的size和algorithm，可以结束了
+    log.close()
 test1.close()
 
 

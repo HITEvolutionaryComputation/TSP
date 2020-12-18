@@ -424,10 +424,9 @@ class TSPProblem:
 
         city_list=[]
         problem = open(file_name, 'r')
-        self.n = int(linecache.getline(file_name, 4).split()[2])  # 城市数量
+        self.n = int(linecache.getline(file_name, 4).split()[2])  # number of city
         for i in range(self.n):
-            i, x, y = linecache.getline(file_name, i + 7).split()#变量？元组
-            #print('%d,%d,%d',i,x,y) 读文件正常
+            i, x, y = linecache.getline(file_name, i + 7).split()
             city_list.append(City(int(x),int(y),int(i)))
 
         self.population = Population(population_number, city_list)
